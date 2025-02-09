@@ -1,0 +1,84 @@
+{
+  "tests": [
+    {
+      "name": "Show python versions",
+      "setup": "",
+      "run": "python src/python_versions.py",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 0
+    },
+    {
+      "name": "Test Assignment Notebook runs all cells cleanly",
+      "setup": "export PYTHONPATH=$(pwd)/src",
+      "run": "cd notebooks; jupyter nbconvert --execute Assg-02-Scikit-Learn-statsmodel.ipynb --to notebook",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Task 1 test task1_sklearn_linear_regression",
+      "setup": "",
+      "run": "PYTHONPATH=$(pwd)/src python -m twisted.trial test_assg_tasks.test_task1_sklearn_linear_regression",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Task 1 test task1_statsmodel_linear_regression",
+      "setup": "",
+      "run": "PYTHONPATH=$(pwd)/src python -m twisted.trial test_assg_tasks.test_task1_statsmodel_linear_regression",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Task 2 test task2_label_encoding",
+      "setup": "",
+      "run": "PYTHONPATH=$(pwd)/src python -m twisted.trial test_assg_tasks.test_task2_label_encoding",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Task 2 test task2_impute_missing_data",
+      "setup": "",
+      "run": "PYTHONPATH=$(pwd)/src python -m twisted.trial test_assg_tasks.test_task2_impute_missing_data",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Task 2 test task2_sklearn_logistic_regression",
+      "setup": "",
+      "run": "PYTHONPATH=$(pwd)/src python -m twisted.trial test_assg_tasks.test_task2_sklearn_logistic_regression",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Task 2 test task2_statsmodel_logistic_regression",
+      "setup": "",
+      "run": "PYTHONPATH=$(pwd)/src python -m twisted.trial test_assg_tasks.test_task2_statsmodel_logistic_regression",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    }
+  ]
+}
