@@ -48,10 +48,25 @@ def task1_sklearn_linear_regression(X, y):
     >>> isclose(rsquared, 0.5008050204985712)
     True
     """
-    # Your work for task 1 linear regression model using scikit-learn
-    # goes here.  Don't forget to return the asked for model and information 
-    # in the return statement
-    return None, 0.0, 0.0, 0.0, 0.0, 0.0
+    # Create the linear regression model
+    model = LinearRegression()
+
+    # Fit the model to the provided data
+    model.fit(X, y)
+
+    # Extract model parameters
+    intercept = model.intercept_  # Intercept of the regression line
+    slope = model.coef_[0]  # Slope (coefficient) of the regression line
+
+    # Make predictions using the trained model
+    y_pred = model.predict(X)
+
+    # Compute evaluation metrics
+    mse = mean_squared_error(y, y_pred)  # Mean Squared Error
+    rmse = np.sqrt(mse)  # Root Mean Squared Error
+    rsquared = model.score(X, y)  # R² score
+
+    return model, intercept, slope, mse, rmse, rsquared
 
 
 def task1_statsmodel_linear_regression(y, X):
@@ -96,9 +111,28 @@ def task1_statsmodel_linear_regression(y, X):
     True
 
     """
-    # your work for task 1 statemodel linear regression goes here
-    return None, 0.0, 0.0, 0.0, 0.0, 0.0
+    # Add an intercept column to X
+    X_with_intercept = sm.add_constant(X)
 
+    # Fit the OLS model
+    model = sm.OLS(y, X_with_intercept).fit()                                       
+
+    # Extract intercept and slope
+    # intercept = model.params[0]
+    intercept = model.params['const']
+    slope = model.params[1]                      
+                                                                                    
+    # Calculate predictions
+    y_pred = model.predict(X_with_intercept)
+
+    # Calculate MSE and RMSE
+    mse = mean_squared_error(y, y_pred)
+    rmse = np.sqrt(mse)
+
+    # Get R-squared value
+    rsquared = model.rsquared
+
+    return model, intercept, slope, mse, rmse, rsquared
 
 def task2_label_encoding(df_rain_tomorrow):
     """
@@ -136,8 +170,39 @@ def task2_label_encoding(df_rain_tomorrow):
     """
     # implement your label encoding for the binary classification labels here, make sure you
     # replace the return statement and return the asked for labels and test values
-    return None, 0, (0,0), 0, 0
 
+    # Ensure the input is a DataFrame (convert if it's a Series)
+    if isinstance(df_rain_tomorrow, pd.Series):
+        df_rain_tomorrow = df_rain_tomorrow.to_frame()
+
+    # Convert column to string type (to avoid dtype issues)
+    df_rain_tomorrow['RainTomorrow'] = df_rain_tomorrow['RainTomorrow'].astype(str)
+
+    # Clean the 'RainTomorrow' column: Map '1' to 'Yes' and '0' to 'No'
+    df_rain_tomorrow['RainTomorrow'] = df_rain_tomorrow['RainTomorrow'].replace({
+        '1': 'Yes',
+        '0': 'No'
+    })
+
+    # Validate that the column contains only 'No' and 'Yes'
+    unique_values = df_rain_tomorrow['RainTomorrow'].unique()
+    if not set(unique_values).issubset({'No', 'Yes'}):
+        raise ValueError(f"Unexpected values in 'RainTomorrow': {unique_values}")
+
+    # Create OrdinalEncoder instance with explicit category order
+    ordinal_encoder = OrdinalEncoder(categories=[['No', 'Yes']])
+
+    # Fit and transform the 'RainTomorrow' column
+    y = ordinal_encoder.fit_transform(df_rain_tomorrow[['RainTomorrow']]).astype(int).flatten()
+
+    # Compute required statistics
+    ndim = y.ndim
+    shape = y.shape
+    num_no = np.sum(y == 0)  # Count of 'No'
+    num_yes = np.sum(y == 1)  # Count of 'Yes'
+
+    return y, ndim, shape, num_no, num_yes
+    
 def task2_impute_missing_data(df):
     """
     Next in task 2, you need to extract and encode the Sunshine and Pressure3pm features,
@@ -187,8 +252,24 @@ def task2_impute_missing_data(df):
     """
     # put your implementation of imputing missing data for the binary classification
     # task 2 here
-    return None, 0, (0, 0), None, None
+    # put your implementation of imputing missing data for the binary classification
+    """Imputes missing data for Sunshine and Pressure3pm."""
 
+    required_cols = ['Sunshine', 'Pressure3pm']  # Define required_cols INSIDE the function (BEFORE the if)
+
+    if not all(col in df.columns for col in required_cols):
+        return None, 0, (0, 0), None, pd.Series()
+
+    X = df[required_cols].copy()
+    imputer = SimpleImputer(strategy='mean')
+    X[:] = imputer.fit_transform(X)
+
+    ndim = X.ndim
+    shape = X.shape
+    columns = X.columns
+    na_sum = X.isna().sum()
+
+    return X, ndim, shape, columns, na_sum
 
 def task2_sklearn_logistic_regression(X, y):
     """
@@ -228,7 +309,18 @@ def task2_sklearn_logistic_regression(X, y):
     """
     # put your implementation of task2 logistic regression using scikit-learn here
     # make sure you return your model and the expected test values in the return statement
-    return None, 0.0, None, 0.0
+    # Create and fit the logistic regression model
+    model = LogisticRegression(solver='lbfgs', C=500.0)
+    model.fit(X, y)
+    
+    # Extract the intercept and slopes
+    intercept = model.intercept_[0]
+    slopes = model.coef_[0]
+    
+    # Calculate accuracy
+    accuracy = accuracy_score(y, model.predict(X))
+    
+    return model, intercept, slopes, accuracy
 
 def task2_statsmodel_logistic_regression(y, X):
     """Given the asked for features X (with a dummy intercept constant
@@ -273,7 +365,21 @@ def task2_statsmodel_logistic_regression(y, X):
     True
 
     """
-    # put your implementation of the task2 logistic regression using the statsmodel
-    # library here.  Make sure you return your actual model and the asked for
-    # test values in the return statement
-    return None, 0.0, None, 0.0
+    # Add a constant (dummy intercept) term to X for statsmodels
+    X_with_intercept = sm.add_constant(X)
+
+    # Fit a logistic regression model using statsmodels
+    model = sm.Logit(y, X_with_intercept).fit(disp=False)  # Fit model, suppress output
+
+    # Extract intercept and slope coefficients
+    intercept = model.params['const']
+    slopes = model.params.drop('const')
+
+    # Predict probabilities and classify based on threshold 0.5
+    y_pred_probs = model.predict(X_with_intercept)
+    y_pred = (y_pred_probs >= 0.5).astype(int)  # Convert probabilities to class labels
+
+    # Compute accuracy
+    accuracy = accuracy_score(y, y_pred)
+
+    return model, intercept, slopes, accuracy
