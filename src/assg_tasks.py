@@ -119,7 +119,7 @@ def task1_statsmodel_linear_regression(y, X):
 
     # Extract intercept and slope
     # intercept = model.params[0]
-    intercept = model.params['const']
+    intercept = model.params[0]
     slope = model.params[1]                      
                                                                                     
     # Calculate predictions
